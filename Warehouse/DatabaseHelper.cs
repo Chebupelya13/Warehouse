@@ -11,7 +11,7 @@ namespace Warehouse
     {
         public static string GetConnectionString()
         {
-            return ConfigurationManager.ConnectionStrings["WarehouseDB"].ConnectionString;
+            return System.Configuration.ConfigurationManager.ConnectionStrings["WarehouseDBConnection"].ConnectionString;
         }
 
         public static SqlConnection GetConnection()

@@ -81,42 +81,36 @@ namespace Warehouse
                 {
                     case "Динамические остатки":
                         dtReport = DatabaseHelper.ExecuteQuery(@"
-                            SELECT p.Name AS Товар, p.Category AS Категория,
-                                   SUM(CASE WHEN m.MovementType = 'Поступление' THEN m.Quantity ELSE -m.Quantity END) AS Остаток
-                            FROM Movements m
-                            JOIN Products p ON m.ProductId = p.Id
-                            GROUP BY p.Name, p.Category");
+                            SELECT p.Name AS [Наименование товара], p.Category AS [Категория номенклатуры],
+                            SUM(CASE WHEN m.MovementType = 'Поступление' THEN m.Quantity ELSE -m.Quantity END) AS [Текущий фактический остаток]
+                            FROM Movements m JOIN Products p ON m.ProductId = p.Id GROUP BY p.Name, p.Category;");
                         break;
                     case "Реестр контрагентов":
-                        dtReport = DatabaseHelper.ExecuteQuery("SELECT Name AS Наименование, ContactInfo AS Контакты, Address AS Адрес FROM Suppliers");
+                        dtReport = DatabaseHelper.ExecuteQuery(@"
+                            SELECT Name AS [Наименование организации (ЮЛ)], ContactInfo AS [Контактные данные менеджера], Address AS [Физический адрес склада поставщика] 
+                            FROM Suppliers ORDER BY Name ASC;");
                         break;
                     case "Аудит транзакций":
                         dtReport = DatabaseHelper.ExecuteQuery(@"
-                            SELECT p.Name AS Товар, m.MovementType AS [Тип движения], m.Quantity AS Количество, m.MovementDate AS Дата
-                            FROM Movements m
-                            JOIN Products p ON m.ProductId = p.Id
-                            WHERE m.MovementDate >= @StartDate AND m.MovementDate <= @EndDate
-                            ORDER BY m.MovementDate DESC",
+                            SELECT p.Name AS [Номенклатурная позиция], m.MovementType AS [Тип складской транзакции], 
+                            m.Quantity AS [Объем (шт.)], m.TotalCost AS [Сумма транзакции (руб.)], m.MovementDate AS [Временная метка операции]
+                            FROM Movements m JOIN Products p ON m.ProductId = p.Id
+                            WHERE m.MovementDate >= @StartDate AND m.MovementDate <= @EndDate ORDER BY m.MovementDate DESC;",
                             new SqlParameter("@StartDate", dtpStartDate.Value.Date),
                             new SqlParameter("@EndDate", dtpEndDate.Value.Date.AddDays(1).AddSeconds(-1)));
                         break;
                     case "Топология запасов":
                         dtReport = DatabaseHelper.ExecuteQuery(@"
-                            SELECT c.Name AS Ячейка, p.Name AS Товар,
-                                   SUM(CASE WHEN m.MovementType = 'Поступление' THEN m.Quantity ELSE -m.Quantity END) AS Остаток
-                            FROM Movements m
-                            JOIN StorageCells c ON m.CellId = c.Id
-                            JOIN Products p ON m.ProductId = p.Id
-                            GROUP BY c.Name, p.Name
-                            HAVING SUM(CASE WHEN m.MovementType = 'Поступление' THEN m.Quantity ELSE -m.Quantity END) > 0");
+                            SELECT c.Name AS [Зона хранения / Ячейка], p.Name AS [Идентификатор товара], 
+                            SUM(CASE WHEN m.MovementType = 'Поступление' THEN m.Quantity ELSE -m.Quantity END) AS [Доступное количество]
+                            FROM Movements m JOIN Products p ON m.ProductId = p.Id JOIN StorageCells c ON m.CellId = c.Id
+                            GROUP BY c.Name, p.Name HAVING SUM(CASE WHEN m.MovementType = 'Поступление' THEN m.Quantity ELSE -m.Quantity END) > 0 ORDER BY c.Name;");
                         break;
                     case "Финансовая аналитика оборота":
                         dtReport = DatabaseHelper.ExecuteQuery(@"
-                            SELECT p.Category AS Категория, SUM(m.TotalCost) AS [Замороженный капитал]
-                            FROM Movements m
-                            JOIN Products p ON m.ProductId = p.Id
-                            WHERE m.MovementType = 'Поступление'
-                            GROUP BY p.Category");
+                            SELECT p.Category AS [Товарная группа], SUM(m.TotalCost) AS [Суммарный оборот замороженного капитала (руб.)], COUNT(m.Id) AS [Количество транзакций закупок]
+                            FROM Movements m JOIN Products p ON m.ProductId = p.Id
+                            WHERE m.MovementType = 'Поступление' GROUP BY p.Category ORDER BY SUM(m.TotalCost) DESC;");
                         break;
                 }
 
@@ -267,16 +261,12 @@ namespace Warehouse
         #region Products
         private void LoadProducts()
         {
-            string query = "SELECT Id, Name, Category, BasePrice FROM Products";
+            string query = "SELECT Id, Name AS [Наименование товара], Category AS [Категория номенклатуры], BasePrice AS [Базовая цена] FROM Products";
             dtProducts = DatabaseHelper.ExecuteQuery(query);
             dvProducts = new DataView(dtProducts);
             dgvProducts.DataSource = dvProducts;
 
             dgvProducts.Columns["Id"].Visible = false;
-            dgvProducts.Columns["Name"].HeaderText = "Наименование";
-            dgvProducts.Columns["Category"].HeaderText = "Категория";
-            dgvProducts.Columns["BasePrice"].HeaderText = "Базовая цена";
-
             UpdateCategoryFilter();
         }
 
@@ -299,17 +289,17 @@ namespace Warehouse
         {
             string search = txtSearchProduct.Text.Trim().Replace("'", "''");
             string category = cmbFilterCategory.SelectedItem?.ToString();
-
             string filter = "";
+
             if (!string.IsNullOrEmpty(search))
             {
-                filter += $"Name LIKE '%{search}%'";
+                filter += $"[Наименование товара] LIKE '%{search}%'";
             }
 
             if (category != "Все" && !string.IsNullOrEmpty(category))
             {
                 if (filter.Length > 0) filter += " AND ";
-                filter += $"Category = '{category.Replace("'", "''")}'";
+                filter += $"[Категория номенклатуры] = '{category.Replace("'", "''")}'";
             }
 
             dvProducts.RowFilter = filter;

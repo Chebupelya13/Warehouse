@@ -60,11 +60,11 @@ namespace Warehouse
 
             if (_productId.HasValue)
             {
-                string query = "UPDATE Products SET Name = @Name, Category = @Category, BasePrice = @BasePrice WHERE Id = @Id";
+                string query = "UPDATE Products SET Name = @Name, Category = @Category, BasePrice = @Price WHERE Id = @Id";
                 DatabaseHelper.ExecuteNonQuery(query,
                     new SqlParameter("@Name", txtName.Text.Trim()),
                     new SqlParameter("@Category", cmbCategory.Text.Trim()),
-                    new SqlParameter("@BasePrice", numBasePrice.Value),
+                    new SqlParameter("@Price", numBasePrice.Value),
                     new SqlParameter("@Id", _productId.Value));
             }
             else

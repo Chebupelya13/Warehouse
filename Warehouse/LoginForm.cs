@@ -24,13 +24,11 @@ namespace Warehouse
             }
 
             string passwordHash = DatabaseHelper.HashPassword(password);
-
-            string query = "SELECT Id, Role FROM Users WHERE Login = @Login AND PasswordHash = @PasswordHash";
-
+            string query = "SELECT Role, Id FROM Users WHERE Login = @Login AND PasswordHash = @ComputedHash";
             SqlParameter[] parameters = new SqlParameter[]
             {
                 new SqlParameter("@Login", login),
-                new SqlParameter("@PasswordHash", passwordHash)
+                new SqlParameter("@ComputedHash", passwordHash)
             };
 
             try
