@@ -297,7 +297,7 @@ namespace Warehouse
 
         private void FilterProducts()
         {
-            string search = txtSearchProduct.Text.Trim();
+            string search = txtSearchProduct.Text.Trim().Replace("'", "''");
             string category = cmbFilterCategory.SelectedItem?.ToString();
 
             string filter = "";
@@ -396,7 +396,7 @@ namespace Warehouse
 
         private void TxtSearchSupplier_TextChanged(object sender, EventArgs e)
         {
-            string search = txtSearchSupplier.Text.Trim();
+            string search = txtSearchSupplier.Text.Trim().Replace("'", "''");
             if (!string.IsNullOrEmpty(search))
             {
                 dvSuppliers.RowFilter = $"Name LIKE '%{search}%'";

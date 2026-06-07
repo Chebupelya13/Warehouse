@@ -53,3 +53,11 @@ INSERT INTO Users (Login, PasswordHash, Role)
 VALUES
 ('admin', '8C6976E5B5410415BDE908BD4DEE15DFB167A9C873FC4BB8A81F6F2AB448A918', 'Администратор'),
 ('store', 'D5367AEA1C17343B6C380F774B81A8D7D5E33C43DC445FDC8A6F884723694F3D', 'Кладовщик');
+
+-- Insert Initial Storage Cells
+INSERT INTO StorageCells (Name, Capacity)
+VALUES
+('Стеллаж А-1', 100),
+('Стеллаж А-2', 150),
+('Стеллаж Б-1', 200),
+('Зона приемки', 500);

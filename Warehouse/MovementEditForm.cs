@@ -19,6 +19,9 @@ namespace Warehouse
             LoadProducts();
             LoadStorageCells();
 
+            cmbProduct.SelectedIndexChanged += CmbProduct_SelectedIndexChanged;
+            numQuantity.ValueChanged += UpdateTotalCost;
+
             if (_movementId.HasValue)
             {
                 this.Text = "Редактирование движения";
@@ -30,9 +33,6 @@ namespace Warehouse
                 dtpMovementDate.Value = DateTime.Now;
                 cmbMovementType.SelectedIndex = 0;
             }
-
-            cmbProduct.SelectedIndexChanged += CmbProduct_SelectedIndexChanged;
-            numQuantity.ValueChanged += UpdateTotalCost;
         }
 
         private void LoadProducts()
