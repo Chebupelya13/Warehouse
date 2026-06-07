@@ -34,6 +34,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -51,6 +52,38 @@
     </Compile>
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DatabaseHelper.cs" />
+    <Compile Include="CurrentUser.cs" />
+    <Compile Include="LoginForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="LoginForm.Designer.cs">
+      <DependentUpon>LoginForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ProductEditForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ProductEditForm.Designer.cs">
+      <DependentUpon>ProductEditForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SupplierEditForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SupplierEditForm.Designer.cs">
+      <DependentUpon>SupplierEditForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="OrderEditForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="OrderEditForm.Designer.cs">
+      <DependentUpon>OrderEditForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MovementEditForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MovementEditForm.Designer.cs">
+      <DependentUpon>MovementEditForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
